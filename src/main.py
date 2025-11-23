@@ -52,6 +52,55 @@ def add_team(
     db_team = crud.create_team_with_members(db, team_data)
     return schemas.TeamResponse(team=schemas.Team.from_orm(db_team))
 
+# 🆕 NOVO ENDPOINT: Adicionar membros a uma equipe existente
+@app.post("/team/addMembers", response_model=schemas.TeamResponse, status_code=status.HTTP_201_CREATED, tags=["Teams"])
+def add_team_members(
+    team_name: str = Body(..., embed=True),
+    members: List[schemas.TeamMember] = Body(..., embed=True, example=[{"user_id": "u3", "username": "Bob", "is_active": True}]),
+    db: Session = Depends(database.get_db)
+):
+    """
+    Adiciona novos membros a uma equipe existente.
+    
+    Exemplo:
+    {
+      "team_name": "backend-squad",
+      "members": [
+        {"user_id": "u3", "username": "Bob", "is_active": true},
+        {"user_id": "u4", "username": "Charlie", "is_active": true}
+      ]
+    }
+    """
+    # Verifica se a equipe existe
+    db_team = crud.get_team_by_name(db, team_name)
+    if not db_team:
+        raise DomainException(status.HTTP_404_NOT_FOUND, "NOT_FOUND", "team not found")
+    
+    # Adiciona os novos membros
+    for member in members:
+        # Verifica se o usuário já existe
+        existing_user = crud.get_user_by_id(db, member.user_id)
+        
+        if existing_user:
+            # Se o usuário já existe, atualiza para esta equipe
+            existing_user.username = member.username
+            existing_user.team_name = team_name
+            existing_user.is_active = member.is_active
+        else:
+            # Cria novo usuário
+            db_user = database.User(
+                user_id=member.user_id,
+                username=member.username,
+                team_name=team_name,
+                is_active=member.is_active
+            )
+            db.add(db_user)
+    
+    db.commit()
+    db.refresh(db_team)
+    
+    return schemas.TeamResponse(team=schemas.Team.from_orm(db_team))
+
 @app.get("/team/get", response_model=schemas.Team, tags=["Teams"])
 def get_team(team_name: str, db: Session = Depends(database.get_db)):
     db_team = crud.get_team_by_name(db, team_name)
