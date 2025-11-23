@@ -4,16 +4,16 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-# Prioridade de configuração do banco de dados
+# IMPORTANTE: Use DATABASE_PUBLIC_URL primeiro, depois fallback para a URL pública hardcoded
 DATABASE_URL = (
     os.getenv('DATABASE_PUBLIC_URL') or 
     os.getenv('DATABASE_URL') or
-    # Fallback: URL pública do Railway hardcoded
+    # Fallback: URL pública do Railway (acessível de qualquer lugar)
     "postgresql://postgres:xdBUjvmTDIoCKHVmVwcnVpauUfNVxVbE@nozomi.proxy.rlwy.net:51678/railway"
 )
 
-# DEBUG: Imprimir a URL (sem senha completa)
-print(f"🔍 Conectando ao banco: {DATABASE_URL.split('@')[1] if '@' in DATABASE_URL else 'URL inválida'}")
+# DEBUG: Ver qual host está sendo usado
+print(f"🔍 Conectando ao: {DATABASE_URL.split('@')[1].split('/')[0] if '@' in DATABASE_URL else 'ERRO'}")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -40,11 +40,9 @@ class PullRequest(Base):
     pull_request_name = Column(String, nullable=False)
     author_id = Column(String, ForeignKey("users.user_id"), nullable=False)
     status = Column(String, default="OPEN", nullable=False)
-    reviewers = Column(String)  # Храним ID ревьюеров через запятую
+    reviewers = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     merged_at = Column(DateTime, nullable=True)
-
-# --- Função para obter sessão do BD ---
 
 def get_db():
     db = SessionLocal()
