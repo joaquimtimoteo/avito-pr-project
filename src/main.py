@@ -11,7 +11,7 @@ from . import crud, schemas, database
 database.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(
-    title="PR Reviewer Assignment Service",
+    title="Avito",
     version="1.0.0",
 )
 
