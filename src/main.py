@@ -60,16 +60,16 @@ def add_team_members(
     db: Session = Depends(database.get_db)
 ):
     """
-    Adiciona novos membros a uma equipe existente.
+    Вы добавляете новых участников в существующую команду.
     
-    Exemplo:
-    {
-      "team_name": "backend-squad",
-      "members": [
-        {"user_id": "u3", "username": "Bob", "is_active": true},
-        {"user_id": "u4", "username": "Charlie", "is_active": true}
-      ]
-    }
+    Пример:
+        {
+        "team_name": "backend-squad",
+        "members": [
+        {"user_id": "u3", "username": "Боб", "is_active": true},
+        {"user_id": "u4", "username": "Чарли", "is_active": true}
+        ]
+        }
     """
     # Verifica se a equipe existe
     db_team = crud.get_team_by_name(db, team_name)
