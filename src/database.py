@@ -4,12 +4,16 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-DATABASE_URL = os.getenv('DATABASE_URL') or os.getenv('DATABASE_PUBLIC_URL') or (
-    f"postgresql://{os.getenv('DB_USER', 'postgres')}:"
-    f"{os.getenv('DB_PASS', 'postgres')}@"
-    f"{os.getenv('DB_HOST', 'localhost')}:"
-    f"{os.getenv('DB_PORT', '5432')}/"
-    f"{os.getenv('DB_NAME', 'railway')}"
+DATABASE_URL = (
+    os.getenv('DATABASE_PUBLIC_URL') or  
+    os.getenv('DATABASE_URL') or         
+    (
+        f"postgresql://{os.getenv('PGUSER') or os.getenv('POSTGRES_USER') or os.getenv('DB_USER', 'postgres')}:"
+        f"{os.getenv('PGPASSWORD') or os.getenv('POSTGRES_PASSWORD') or os.getenv('DB_PASS', 'postgres')}@"
+        f"{os.getenv('PGHOST') or os.getenv('DB_HOST', 'localhost')}:"
+        f"{os.getenv('PGPORT') or os.getenv('DB_PORT', '5432')}/"
+        f"{os.getenv('PGDATABASE') or os.getenv('POSTGRES_DB') or os.getenv('DB_NAME', 'railway')}"
+    )
 )
 
 engine = create_engine(DATABASE_URL)
