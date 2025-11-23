@@ -17,7 +17,7 @@
 
 1. **Клонируйте репозиторий:**
    ```sh
-   git clone <your-repo-url>
+   git clone https://github.com/YUNIX-sudo/avito-pr-project
    cd <project-folder>
    ```
 
