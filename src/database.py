@@ -4,18 +4,19 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-# Загружаем переменные окружения для подключения к БД
-DATABASE_URL = (
-    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}"
-    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+DATABASE_URL = os.getenv('DATABASE_URL') or os.getenv('DATABASE_PUBLIC_URL') or (
+    f"postgresql://{os.getenv('DB_USER', 'postgres')}:"
+    f"{os.getenv('DB_PASS', 'postgres')}@"
+    f"{os.getenv('DB_HOST', 'localhost')}:"
+    f"{os.getenv('DB_PORT', '5432')}/"
+    f"{os.getenv('DB_NAME', 'railway')}"
 )
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# --- ORM Модели ---
-# Имена полей приведены в соответствие с API для упрощения кода
+# --- ORM Modelos ---
 
 class Team(Base):
     __tablename__ = "teams"
@@ -40,7 +41,7 @@ class PullRequest(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     merged_at = Column(DateTime, nullable=True)
 
-# --- Функция для получения сессии БД ---
+# --- Função para obter sessão do BD ---
 
 def get_db():
     db = SessionLocal()
