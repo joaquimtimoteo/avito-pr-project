@@ -4,17 +4,16 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
+# Prioridade de configuração do banco de dados
 DATABASE_URL = (
-    os.getenv('DATABASE_PUBLIC_URL') or  
-    os.getenv('DATABASE_URL') or         
-    (
-        f"postgresql://{os.getenv('PGUSER') or os.getenv('POSTGRES_USER') or os.getenv('DB_USER', 'postgres')}:"
-        f"{os.getenv('PGPASSWORD') or os.getenv('POSTGRES_PASSWORD') or os.getenv('DB_PASS', 'postgres')}@"
-        f"{os.getenv('PGHOST') or os.getenv('DB_HOST', 'localhost')}:"
-        f"{os.getenv('PGPORT') or os.getenv('DB_PORT', '5432')}/"
-        f"{os.getenv('PGDATABASE') or os.getenv('POSTGRES_DB') or os.getenv('DB_NAME', 'railway')}"
-    )
+    os.getenv('DATABASE_PUBLIC_URL') or 
+    os.getenv('DATABASE_URL') or
+    # Fallback: URL pública do Railway hardcoded
+    "postgresql://postgres:xdBUjvmTDIoCKHVmVwcnVpauUfNVxVbE@nozomi.proxy.rlwy.net:51678/railway"
 )
+
+# DEBUG: Imprimir a URL (sem senha completa)
+print(f"🔍 Conectando ao banco: {DATABASE_URL.split('@')[1] if '@' in DATABASE_URL else 'URL inválida'}")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
