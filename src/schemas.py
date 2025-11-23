@@ -1,34 +1,31 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import datetime
 
-# --- Схемы для ответов API ---
-# orm_mode = True позволяет автоматически преобразовывать
-# объекты SQLAlchemy в Pydantic схемы, если имена полей совпадают.
+# --- Schemas para respostas API ---
+# from_attributes=True permite converter automaticamente
+# objetos SQLAlchemy em schemas Pydantic, se os nomes dos campos coincidirem.
 
 class TeamMember(BaseModel):
     user_id: str
     username: str
     is_active: bool
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class Team(BaseModel):
     team_name: str
     members: List[TeamMember]
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class User(BaseModel):
     user_id: str
     username: str
-    team_name: Optional[str] = None # team_name может быть null
+    team_name: Optional[str] = None  # team_name pode ser null
     is_active: bool
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PullRequestShort(BaseModel):
     pull_request_id: str
@@ -36,8 +33,7 @@ class PullRequestShort(BaseModel):
     author_id: str
     status: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PullRequest(BaseModel):
     pull_request_id: str
@@ -48,12 +44,13 @@ class PullRequest(BaseModel):
     createdAt: Optional[datetime] = Field(None, alias='created_at')
     mergedAt: Optional[datetime] = Field(None, alias='merged_at')
 
-    class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True  # Substitui allow_population_by_field_name
+    )
 
 
-# --- Схемы для тел запросов (Request Bodies) ---
+# --- Schemas para Request Bodies ---
 
 class TeamAddRequest(BaseModel):
     team_name: str
@@ -80,7 +77,7 @@ class DeactivateTeamMembersRequest(BaseModel):
     user_ids: List[str]
 
 
-# --- Схемы для "оберток" ответов ---
+# --- Schemas para "wrappers" de respostas ---
 
 class TeamResponse(BaseModel):
     team: Team
